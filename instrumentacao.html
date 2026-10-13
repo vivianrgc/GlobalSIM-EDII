@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block titulo %}Instrumentação{% endblock %}
+{% block conteudo %}
+{% set est = dados.estatisticas %}
+{% set m = dados.metricas %}
+{% set ult = dados.ultima_operacao %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="mb-0">Instrumentação da Tabela Hash</h2>
+  <form method="post" action="{{ url_for('zerar_instrumentacao') }}">
+    <button class="btn btn-sm btn-outline-secondary" type="submit">Zerar contadores</button>
+  </form>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3"><div class="card gs-card"><div class="card-body">
+    <div class="gs-num">{{ est.tamanho }}</div><div class="text-muted small">elementos</div></div></div></div>
+  <div class="col-6 col-md-3"><div class="card gs-card"><div class="card-body">
+    <div class="gs-num">{{ est.capacidade }}</div><div class="text-muted small">capacidade (primo)</div></div></div></div>
+  <div class="col-6 col-md-3"><div class="card gs-card"><div class="card-body">
+    <div class="gs-num">{{ '%.2f'|format(est.fator_carga) }}</div><div class="text-muted small">fator de carga (máx. {{ est.fator_carga_max }})</div></div></div></div>
+  <div class="col-6 col-md-3"><div class="card gs-card"><div class="card-body">
+    <div class="gs-num">{{ est.maior_cadeia }}</div><div class="text-muted small">maior cadeia</div></div></div></div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-lg-6">
+    <div class="card gs-card h-100"><div class="card-body">
+      <h5 class="card-title">Contadores acumulados</h5>
+      <table class="table table-sm mb-0">
+        <tr><td>Inserções</td><td class="text-end">{{ m.insercoes }}</td></tr>
+        <tr><td>Buscas (com sucesso)</td><td class="text-end">{{ m.buscas }} ({{ m.buscas_com_sucesso }})</td></tr>
+        <tr><td>Atualizações</td><td class="text-end">{{ m.atualizacoes }}</td></tr>
+        <tr><td>Remoções</td><td class="text-end">{{ m.remocoes }}</td></tr>
+        <tr><td>Colisões (inserção em bucket ocupado)</td><td class="text-end">{{ m.colisoes }}</td></tr>
+        <tr><td>Comparações de chave</td><td class="text-end">{{ m.comparacoes }}</td></tr>
+        <tr><td>Redimensionamentos (rehash)</td><td class="text-end">{{ m.redimensionamentos }}</td></tr>
+        <tr><td>Buckets usados / vazios</td><td class="text-end">{{ est.buckets_usados }} / {{ est.buckets_vazios }}</td></tr>
+        <tr><td>Média de elementos por bucket usado</td><td class="text-end">{{ '%.2f'|format(est.media_cadeia) }}</td></tr>
+      </table>
+      {% if dados.redimensionamentos %}
+      <hr>
+      <div class="small text-muted">
+        Rehash: {% for r in dados.redimensionamentos %}{{ r.de }} → {{ r.para }} ({{ r.elementos }} elem.){{ ', ' if not loop.last }}{% endfor %}
+      </div>
+      {% endif %}
+    </div></div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card gs-card h-100"><div class="card-body">
+      <h5 class="card-title">Última operação</h5>
+      {% if ult %}
+      <table class="table table-sm mb-0">
+        <tr><td>Operação</td><td class="text-end"><span class="badge text-bg-primary">{{ ult.operacao }}</span> {{ ult.resultado }}</td></tr>
+        <tr><td>Chave</td><td class="text-end">{{ ult.chave }}</td></tr>
+        <tr><td>Hash (djb2)</td><td class="text-end">{{ ult.hash }}</td></tr>
+        <tr><td>Índice (hash mod {{ ult.capacidade }})</td><td class="text-end">{{ ult.indice }}</td></tr>
+        <tr><td>Comparações</td><td class="text-end">{{ ult.comparacoes }}</td></tr>
+        <tr><td>Houve colisão?</td><td class="text-end">{{ 'sim' if ult.colisao else 'não' }}</td></tr>
+      </table>
+      {% else %}
+      <p class="text-muted mb-0">Nenhuma operação registrada desde o último zeramento. Faça uma consulta, cadastro ou remoção.</p>
+      {% endif %}
+    </div></div>
+  </div>
+</div>
+
+<div class="card gs-card mb-4"><div class="card-body">
+  <h5 class="card-title">Calculadora de hash</h5>
+  <p class="text-muted small">Veja como um código vira um índice na tabela (esta consulta não altera a estrutura nem os contadores).</p>
+  <form method="get" class="row g-2 mb-3">
+    <div class="col-auto"><input class="form-control" name="codigo" maxlength="2" placeholder="IT" value="{{ codigo }}" style="text-transform: uppercase"></div>
+    <div class="col-auto"><button class="btn btn-outline-primary" type="submit">Calcular</button></div>
+  </form>
+  {% if explicacao %}
+  <table class="table table-sm">
+    <thead><tr><th>Caractere</th><th>ASCII</th><th>Cálculo (h × 33 + código)</th><th class="text-end">h</th></tr></thead>
+    <tbody>
+      <tr><td colspan="3" class="text-muted">valor inicial</td><td class="text-end">5381</td></tr>
+      {% for p in explicacao.passos %}
+      <tr><td>{{ p.caractere }}</td><td>{{ p.codigo }}</td><td>{{ p.calculo }}</td><td class="text-end">{{ p.resultado }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p class="mb-0"><strong>índice = {{ explicacao.hash }} mod {{ explicacao.capacidade }} = {{ explicacao.indice }}</strong></p>
+  {% endif %}
+</div></div>
+
+<div class="card gs-card"><div class="card-body">
+  <h5 class="card-title">Buckets (encadeamento separado)</h5>
+  <div class="table-responsive">
+    <table class="table table-sm align-middle mb-0">
+      <thead><tr><th style="width:80px">Índice</th><th>Cadeia</th><th style="width:90px" class="text-end">Tamanho</th></tr></thead>
+      <tbody>
+        {% for b in dados.buckets %}
+        <tr class="{{ 'table-warning' if b.tamanho > 1 }}">
+          <td>{{ b.indice }}</td>
+          <td>
+            {% if b.chaves %}
+              {% for chave in b.chaves %}<span class="badge text-bg-dark">{{ chave }}</span>{{ ' → ' if not loop.last }}{% endfor %}
+            {% else %}<span class="text-muted">—</span>{% endif %}
+          </td>
+          <td class="text-end">{{ b.tamanho }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="small text-muted mt-2">Linhas amarelas indicam colisão (mais de uma chave no mesmo bucket).</div>
+</div></div>
+{% endblock %}

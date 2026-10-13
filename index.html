@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block titulo %}Início{% endblock %}
+{% block conteudo %}
+<div class="gs-hero rounded-4 p-4 p-md-5 mb-4 text-white">
+  <h1 class="display-5 fw-bold">Global<span class="gs-sim">SIM</span></h1>
+  <p class="lead mb-3">Serviço internacional de Internet por eSIM para viajantes.</p>
+  <p class="mb-4">Nesta etapa, os países atendidos são gerenciados por uma <strong>Tabela Hash</strong>
+    própria (encadeamento separado + rehash dinâmico). Cada operação feita aqui pode ser observada na tela de instrumentação.</p>
+  <a class="btn btn-light btn-lg me-2" href="{{ url_for('cobertura') }}">Consultar cobertura</a>
+  <a class="btn btn-outline-light btn-lg" href="{{ url_for('listar_paises') }}">Ver países</a>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-4">
+    <div class="card gs-card h-100"><div class="card-body">
+      <div class="gs-num">{{ total }}</div>
+      <div class="text-muted">países atendidos</div>
+    </div></div>
+  </div>
+  <div class="col-md-4">
+    <div class="card gs-card h-100"><div class="card-body">
+      <div class="gs-num">{{ estatisticas.capacidade }}</div>
+      <div class="text-muted">buckets na Tabela Hash</div>
+    </div></div>
+  </div>
+  <div class="col-md-4">
+    <div class="card gs-card h-100"><div class="card-body">
+      <div class="gs-num">{{ '%.0f'|format(estatisticas.fator_carga * 100) }}%</div>
+      <div class="text-muted">fator de carga (limite {{ '%.0f'|format(estatisticas.fator_carga_max * 100) }}%)</div>
+    </div></div>
+  </div>
+</div>
+
+<div class="row g-3 mt-1">
+  <div class="col-md-6">
+    <a class="card gs-card h-100 text-decoration-none" href="{{ url_for('novo_pais') }}"><div class="card-body">
+      <h5 class="card-title">Cadastrar país</h5>
+      <p class="card-text text-muted mb-0">Insere um novo país na Tabela Hash e persiste no JSON.</p>
+    </div></a>
+  </div>
+  <div class="col-md-6">
+    <a class="card gs-card h-100 text-decoration-none" href="{{ url_for('instrumentacao') }}"><div class="card-body">
+      <h5 class="card-title">Instrumentação da estrutura</h5>
+      <p class="card-text text-muted mb-0">Buckets, colisões, cadeias, redimensionamentos e o cálculo do hash.</p>
+    </div></a>
+  </div>
+</div>
+{% endblock %}

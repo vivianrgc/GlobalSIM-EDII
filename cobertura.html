@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block titulo %}Cobertura{% endblock %}
+{% block conteudo %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <h2 class="mb-3">Consulta de cobertura</h2>
+    <div class="card gs-card mb-4"><div class="card-body">
+      <form method="get" action="{{ url_for('cobertura') }}" class="row g-2 align-items-end">
+        <div class="col">
+          <label class="form-label" for="codigo">Código do país</label>
+          <input class="form-control" id="codigo" name="codigo" maxlength="2" placeholder="IT"
+                 style="text-transform: uppercase" value="{{ codigo }}" required autofocus>
+        </div>
+        <div class="col-auto">
+          <button class="btn btn-primary" type="submit">Verificar cobertura</button>
+        </div>
+      </form>
+    </div></div>
+
+    {% if consultou %}
+      {% if pais %}
+      <div class="card gs-card border-success">
+        <div class="card-header bg-success text-white fw-bold">COBERTURA DISPONÍVEL</div>
+        <div class="card-body">
+          <dl class="row mb-0">
+            <dt class="col-sm-4">País</dt><dd class="col-sm-8">{{ pais.pais }} <span class="badge text-bg-dark">{{ pais.codigo }}</span></dd>
+            <dt class="col-sm-4">Região</dt><dd class="col-sm-8">{{ pais.regiao }}</dd>
+            <dt class="col-sm-4">Operadora</dt><dd class="col-sm-8">{{ pais.operadora }}</dd>
+            <dt class="col-sm-4">Tecnologia</dt><dd class="col-sm-8"><span class="badge text-bg-info">{{ pais.tecnologia }}</span></dd>
+          </dl>
+        </div>
+      </div>
+      {% else %}
+      <div class="card gs-card border-danger">
+        <div class="card-header bg-danger text-white fw-bold">COBERTURA INDISPONÍVEL</div>
+        <div class="card-body">Não há país atendido com o código <strong>{{ codigo }}</strong>.
+          <a href="{{ url_for('novo_pais') }}">Cadastrar este país</a>.</div>
+      </div>
+      {% endif %}
+
+      {% if busca %}
+      <p class="small text-muted mt-3 mb-0">
+        <strong>Como a Tabela Hash respondeu:</strong>
+        hash("{{ busca.chave }}") = {{ busca.hash }} → índice {{ busca.indice }} (mod {{ busca.capacidade }}) ·
+        {{ busca.comparacoes }} comparação{{ '' if busca.comparacoes == 1 else 'ões' }} ·
+        <a href="{{ url_for('instrumentacao', codigo=busca.chave) }}">ver detalhes</a>
+      </p>
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
