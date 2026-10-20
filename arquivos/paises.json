@@ -1,0 +1,10 @@
+[
+  {"codigo": "BR", "pais": "Brasil", "regiao": "América do Sul", "operadora": "Operadora BR", "tecnologia": "5G"},
+  {"codigo": "PT", "pais": "Portugal", "regiao": "Europa", "operadora": "Operadora PT", "tecnologia": "5G"},
+  {"codigo": "ES", "pais": "Espanha", "regiao": "Europa", "operadora": "Operadora ES", "tecnologia": "5G"},
+  {"codigo": "FR", "pais": "França", "regiao": "Europa", "operadora": "Operadora FR", "tecnologia": "5G"},
+  {"codigo": "IT", "pais": "Itália", "regiao": "Europa", "operadora": "Operadora IT", "tecnologia": "5G"},
+  {"codigo": "US", "pais": "Estados Unidos", "regiao": "América do Norte", "operadora": "Operadora US", "tecnologia": "5G"},
+  {"codigo": "CA", "pais": "Canadá", "regiao": "América do Norte", "operadora": "Operadora CA", "tecnologia": "5G"},
+  {"codigo": "JP", "pais": "Japão", "regiao": "Ásia", "operadora": "Operadora JP", "tecnologia": "5G"}
+]

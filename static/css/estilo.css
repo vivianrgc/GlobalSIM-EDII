@@ -1,0 +1,22 @@
+:root {
+  --gs-azul: #0b3d91;
+  --gs-azul-claro: #1d9bf0;
+  --gs-fundo: #f3f6fb;
+}
+
+body { background: var(--gs-fundo); }
+
+.gs-nav { background: linear-gradient(90deg, #08265f, var(--gs-azul)); }
+.gs-sim { color: var(--gs-azul-claro); }
+.gs-nav .gs-sim { color: #7cc4ff; }
+
+.gs-hero {
+  background: linear-gradient(135deg, #08265f 0%, var(--gs-azul) 55%, #1d9bf0 100%);
+}
+.gs-hero .gs-sim { color: #9fd6ff; }
+
+.gs-card { border: 0; box-shadow: 0 1px 4px rgba(10, 30, 70, .10); border-radius: .85rem; }
+a.gs-card { color: inherit; transition: transform .12s ease, box-shadow .12s ease; }
+a.gs-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(10, 30, 70, .16); }
+
+.gs-num { font-size: 2rem; font-weight: 700; color: var(--gs-azul); line-height: 1.1; }

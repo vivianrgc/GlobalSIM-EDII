@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block titulo %}{{ 'Cadastrar país' if modo == 'novo' else 'Editar país' }}{% endblock %}
+{% block conteudo %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <h2 class="mb-3">{{ 'Cadastrar país atendido' if modo == 'novo' else 'Editar ' ~ dados.codigo }}</h2>
+    <div class="card gs-card"><div class="card-body">
+      <form method="post" novalidate>
+        <div class="mb-3">
+          <label class="form-label" for="codigo">Código do país (2 letras)</label>
+          <input class="form-control {{ 'is-invalid' if erros.codigo }}" id="codigo" name="codigo"
+                 maxlength="2" style="text-transform: uppercase" placeholder="IT"
+                 value="{{ dados.codigo or '' }}" {{ 'readonly' if modo == 'editar' }} required>
+          {% if modo == 'editar' %}<div class="form-text">O código é a chave da Tabela Hash e não pode ser alterado.</div>{% endif %}
+          {% if erros.codigo %}<div class="invalid-feedback">{{ erros.codigo }}</div>{% endif %}
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="pais">País</label>
+          <input class="form-control {{ 'is-invalid' if erros.pais }}" id="pais" name="pais" placeholder="Itália"
+                 value="{{ dados.pais or '' }}" required>
+          {% if erros.pais %}<div class="invalid-feedback">{{ erros.pais }}</div>{% endif %}
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="regiao">Região</label>
+          <input class="form-control {{ 'is-invalid' if erros.regiao }}" id="regiao" name="regiao" placeholder="Europa"
+                 value="{{ dados.regiao or '' }}" required>
+          {% if erros.regiao %}<div class="invalid-feedback">{{ erros.regiao }}</div>{% endif %}
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="operadora">Operadora</label>
+          <input class="form-control {{ 'is-invalid' if erros.operadora }}" id="operadora" name="operadora"
+                 placeholder="Operadora IT" value="{{ dados.operadora or '' }}" required>
+          {% if erros.operadora %}<div class="invalid-feedback">{{ erros.operadora }}</div>{% endif %}
+        </div>
+        <div class="mb-4">
+          <label class="form-label" for="tecnologia">Tecnologia</label>
+          <select class="form-select {{ 'is-invalid' if erros.tecnologia }}" id="tecnologia" name="tecnologia" required>
+            <option value="" disabled {{ 'selected' if not dados.tecnologia }}>Selecione…</option>
+            {% for t in tecnologias %}
+            <option value="{{ t }}" {{ 'selected' if dados.tecnologia == t }}>{{ t }}</option>
+            {% endfor %}
+          </select>
+          {% if erros.tecnologia %}<div class="invalid-feedback">{{ erros.tecnologia }}</div>{% endif %}
+        </div>
+        <button class="btn btn-primary" type="submit">{{ 'Cadastrar' if modo == 'novo' else 'Salvar alterações' }}</button>
+        <a class="btn btn-link" href="{{ url_for('listar_paises') }}">Cancelar</a>
+      </form>
+    </div></div>
+  </div>
+</div>
+{% endblock %}

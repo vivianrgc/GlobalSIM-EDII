@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block titulo %}Países{% endblock %}
+{% block conteudo %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="mb-0">Países atendidos <span class="badge text-bg-secondary">{{ paises|length }}</span></h2>
+  <a class="btn btn-primary" href="{{ url_for('novo_pais') }}">+ Cadastrar país</a>
+</div>
+
+{% if paises %}
+<div class="card gs-card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr><th>Código</th><th>País</th><th>Região</th><th>Operadora</th><th>Tecnologia</th><th class="text-end">Ações</th></tr>
+      </thead>
+      <tbody>
+        {% for p in paises %}
+        <tr>
+          <td><span class="badge text-bg-dark">{{ p.codigo }}</span></td>
+          <td>{{ p.pais }}</td>
+          <td>{{ p.regiao }}</td>
+          <td>{{ p.operadora }}</td>
+          <td><span class="badge text-bg-info">{{ p.tecnologia }}</span></td>
+          <td class="text-end text-nowrap">
+            <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('cobertura', codigo=p.codigo) }}">Cobertura</a>
+            <a class="btn btn-sm btn-outline-primary" href="{{ url_for('editar_pais', codigo=p.codigo) }}">Editar</a>
+            <form class="d-inline" method="post" action="{{ url_for('remover_pais', codigo=p.codigo) }}"
+                  onsubmit="return confirm('Remover {{ p.pais }} ({{ p.codigo }})?');">
+              <button class="btn btn-sm btn-outline-danger" type="submit">Remover</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="alert alert-secondary">Nenhum país cadastrado ainda.</div>
+{% endif %}
+{% endblock %}
