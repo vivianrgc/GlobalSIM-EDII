@@ -27,9 +27,35 @@
             <dt class="col-sm-4">Região</dt><dd class="col-sm-8">{{ pais.regiao }}</dd>
             <dt class="col-sm-4">Operadora</dt><dd class="col-sm-8">{{ pais.operadora }}</dd>
             <dt class="col-sm-4">Tecnologia</dt><dd class="col-sm-8"><span class="badge text-bg-info">{{ pais.tecnologia }}</span></dd>
+            <dt class="col-sm-4">Estado</dt>
+            <dd class="col-sm-8">{% if pais.estado == 'falha' %}<span class="badge text-bg-danger">EM FALHA</span>{% else %}<span class="badge text-bg-success">ativo</span>{% endif %}</dd>
           </dl>
         </div>
+        <div class="card-footer bg-white">
+          <form method="post" action="{{ url_for('estado_pais', codigo=pais.codigo) }}" class="d-flex align-items-center gap-2">
+            {% if pais.estado == 'falha' %}
+            <input type="hidden" name="estado" value="ativo">
+            <button class="btn btn-sm btn-outline-success" type="submit">Restabelecer país</button>
+            {% else %}
+            <input type="hidden" name="estado" value="falha">
+            <button class="btn btn-sm btn-outline-danger" type="submit">Simular falha</button>
+            {% endif %}
+            <span class="small text-muted">Diferencial: estado operacional do país.</span>
+          </form>
+        </div>
       </div>
+      {% if pais.estado == 'falha' %}
+      <div class="card gs-card border-warning mt-3">
+        <div class="card-header bg-warning fw-bold">Clientes afetados (destino {{ pais.codigo }}): {{ afetados_total }}</div>
+        <div class="card-body small">
+          {% if afetados %}
+          {% for c in afetados %}<a class="badge text-bg-light border text-decoration-none" href="{{ url_for('detalhe_cliente', cliente_id=c.id) }}">{{ c.id }} · {{ c.nome }}</a> {% endfor %}
+          {% if afetados_total > afetados|length %}<span class="text-muted">… e mais {{ afetados_total - afetados|length }}</span>{% endif %}
+          <div class="text-muted mt-2">Lista obtida pelo percurso em ordem da Árvore B.</div>
+          {% else %}Nenhum cliente com este destino.{% endif %}
+        </div>
+      </div>
+      {% endif %}
       {% else %}
       <div class="card gs-card border-danger">
         <div class="card-header bg-danger text-white fw-bold">COBERTURA INDISPONÍVEL</div>
