@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block titulo %}Pacotes{% endblock %}
+{% block conteudo %}
+<h2 class="mb-3">Pacotes de dados <span class="badge text-bg-secondary">{{ pacotes|length }}</span></h2>
+<div class="card gs-card"><div class="table-responsive">
+  <table class="table align-middle mb-0">
+    <thead><tr><th>ID</th><th>Pacote</th><th>Regiões cobertas</th><th>Dados</th><th>Validade</th><th class="text-end">Preço</th></tr></thead>
+    <tbody>
+      {% for p in pacotes %}
+      <tr>
+        <td><span class="badge text-bg-dark">{{ p.id }}</span></td><td>{{ p.nome }}</td><td>{{ p.regioes|join(', ') }}</td>
+        <td>{{ p.dados_gb }} GB</td><td>{{ p.validade_dias }} dias</td><td class="text-end">R$ {{ '%.2f'|format(p.preco)|replace('.', ',') }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div></div>
+{% endblock %}
