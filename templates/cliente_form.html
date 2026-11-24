@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block titulo %}{{ 'Cadastrar cliente' if modo == 'novo' else 'Editar cliente' }}{% endblock %}
+{% block conteudo %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <h2 class="mb-3">{{ 'Cadastrar cliente' if modo == 'novo' else 'Editar cliente ' ~ dados.id }}</h2>
+    <div class="card gs-card"><div class="card-body">
+      <form method="post" novalidate>
+        {% if modo == 'editar' %}
+        <div class="mb-3">
+          <label class="form-label">ID (chave da Árvore B)</label>
+          <input class="form-control" value="{{ dados.id }}" readonly>
+          <div class="form-text">O ID não pode ser alterado. A alteração é uma busca na árvore seguida da troca do registro.</div>
+        </div>
+        {% else %}
+        <p class="text-muted small">O ID é gerado automaticamente (maior ID da árvore + 1).</p>
+        {% endif %}
+        <div class="mb-3">
+          <label class="form-label" for="nome">Nome</label>
+          <input class="form-control {{ 'is-invalid' if erros.nome }}" id="nome" name="nome" value="{{ dados.nome or '' }}" required>
+          {% if erros.nome %}<div class="invalid-feedback">{{ erros.nome }}</div>{% endif %}
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="email">E-mail</label>
+          <input class="form-control {{ 'is-invalid' if erros.email }}" id="email" name="email" type="email" value="{{ dados.email or '' }}" required>
+          {% if erros.email %}<div class="invalid-feedback">{{ erros.email }}</div>{% endif %}
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label" for="pais_origem">País de origem</label>
+            <select class="form-select {{ 'is-invalid' if erros.pais_origem }}" id="pais_origem" name="pais_origem" required>
+              <option value="" disabled {{ 'selected' if not dados.pais_origem }}>Selecione…</option>
+              {% for p in paises %}<option value="{{ p.codigo }}" {{ 'selected' if dados.pais_origem == p.codigo }}>{{ p.codigo }} — {{ p.pais }}</option>{% endfor %}
+            </select>
+            {% if erros.pais_origem %}<div class="invalid-feedback">{{ erros.pais_origem }}</div>{% endif %}
+          </div>
+          <div class="col-md-6 mb-4">
+            <label class="form-label" for="destino">Destino (opcional)</label>
+            <select class="form-select {{ 'is-invalid' if erros.destino }}" id="destino" name="destino">
+              <option value="">Sem destino</option>
+              {% for p in paises %}<option value="{{ p.codigo }}" {{ 'selected' if dados.destino == p.codigo }}>{{ p.codigo }} — {{ p.pais }}</option>{% endfor %}
+            </select>
+            {% if erros.destino %}<div class="invalid-feedback">{{ erros.destino }}</div>{% endif %}
+          </div>
+        </div>
+        <button class="btn btn-primary" type="submit">{{ 'Cadastrar' if modo == 'novo' else 'Salvar alterações' }}</button>
+        <a class="btn btn-link" href="{{ url_for('listar_clientes') }}">Cancelar</a>
+      </form>
+    </div></div>
+  </div>
+</div>
+{% endblock %}
