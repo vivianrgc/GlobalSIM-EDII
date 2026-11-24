@@ -64,7 +64,7 @@ globalsim/
 │   └── clientes.json         # ~1000 clientes (gerado na primeira execução)
 ├── templates/                # Jinja (países, clientes, consulta, árvore, instrumentação...)
 ├── static/css/estilo.css
-└── tests/                   # test_etapa1.py e test_etapa2.py
+└── tests/                    # test_etapa1.py e test_etapa2.py
 ```
 
 A lógica das estruturas está **separada das rotas**: `app.py` só usa `request`, `render_template`, `redirect` e `flash`; as regras ficam em `servicos/` e `estruturas/`.
@@ -98,7 +98,7 @@ Operações: `inserir`, `buscar`, `atualizar`, `remover`, `contem` (sem afetar m
 - **Histórico de rehash** (ex.: `7 → 17`).
 - **Visão dos buckets** com as cadeias (linhas amarelas = colisão).
 - **Calculadora de hash** passo a passo (`/instrumentacao?codigo=IT`).
-- A página de **cobertura** também mostra como a tabela respondeu (indice e comparações).
+- A página de **cobertura** também mostra como a tabela respondeu (índice e comparações).
 
 Exemplo real após a carga inicial dos 8 países (capacidade 7 → 17 com 1 rehash):
 
@@ -123,7 +123,7 @@ Arquivo: `estruturas/arvore_b.py`. Chave: **ID do cliente** (inteiro, único). G
 | Listagem | Percurso **em ordem** (ordem crescente de ID); a paginação pula os itens anteriores | Não precisa ordenar nada à parte |
 | Remoção | Não implementada | O enunciado só pede busca, inserção, alteração e listagem |
 
-As listas Python são só o conteiner interno de cada nó (chaves, registros e filhos); a busca é feita descendo pelos nós, sem `dict`.
+As listas Python são só o contêiner interno de cada nó (chaves, registros e filhos); a busca é feita descendo pelos nós, sem `dict`.
 
 **Persistência:** `arquivos/clientes.json` é lido ao iniciar (cada cliente é inserido na árvore) e regravado após cada alteração (escrita atômica, em ordem de ID). Toda consulta passa pela Árvore B.
 
