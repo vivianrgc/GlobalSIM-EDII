@@ -1,0 +1,7 @@
+[
+  {"id": "EUR-5", "nome": "Europa Essencial", "regioes": ["Europa"], "dados_gb": 5, "validade_dias": 15, "preco": 59.90},
+  {"id": "AME-10", "nome": "Américas", "regioes": ["América do Sul", "América do Norte"], "dados_gb": 10, "validade_dias": 30, "preco": 119.90},
+  {"id": "ASI-8", "nome": "Ásia Explorer", "regioes": ["Ásia"], "dados_gb": 8, "validade_dias": 15, "preco": 89.90},
+  {"id": "GLB-3", "nome": "Global Lite", "regioes": ["Europa", "América do Sul", "América do Norte", "Ásia"], "dados_gb": 3, "validade_dias": 7, "preco": 79.90},
+  {"id": "GLB-20", "nome": "Global Plus", "regioes": ["Europa", "América do Sul", "América do Norte", "Ásia"], "dados_gb": 20, "validade_dias": 30, "preco": 199.90}
+]
