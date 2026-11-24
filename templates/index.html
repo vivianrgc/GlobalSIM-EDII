@@ -4,10 +4,11 @@
 <div class="gs-hero rounded-4 p-4 p-md-5 mb-4 text-white">
   <h1 class="display-5 fw-bold">Global<span class="gs-sim">SIM</span></h1>
   <p class="lead mb-3">Serviço internacional de Internet por eSIM para viajantes.</p>
-  <p class="mb-4">Nesta etapa, os países atendidos são gerenciados por uma <strong>Tabela Hash</strong>
-    própria (encadeamento separado + rehash dinâmico). Cada operação feita aqui pode ser observada na tela de instrumentação.</p>
-  <a class="btn btn-light btn-lg me-2" href="{{ url_for('cobertura') }}">Consultar cobertura</a>
-  <a class="btn btn-outline-light btn-lg" href="{{ url_for('listar_paises') }}">Ver países</a>
+  <p class="mb-4">Os países atendidos ficam numa <strong>Tabela Hash</strong> própria (encadeamento + rehash dinâmico)
+    e os clientes numa <strong>Árvore B</strong> própria (grau mínimo configurável). Cada operação pode ser observada nas telas de instrumentação.</p>
+  <a class="btn btn-light btn-lg me-2" href="{{ url_for('consulta') }}">Consulta integrada</a>
+  <a class="btn btn-outline-light btn-lg me-2" href="{{ url_for('cobertura') }}">Consultar cobertura</a>
+  <a class="btn btn-outline-light btn-lg" href="{{ url_for('listar_clientes') }}">Ver clientes</a>
 </div>
 
 <div class="row g-3">
@@ -28,6 +29,27 @@
       <div class="gs-num">{{ '%.0f'|format(estatisticas.fator_carga * 100) }}%</div>
       <div class="text-muted">fator de carga (limite {{ '%.0f'|format(estatisticas.fator_carga_max * 100) }}%)</div>
     </div></div>
+  </div>
+</div>
+
+<div class="row g-3 mt-1">
+  <div class="col-md-4">
+    <div class="card gs-card h-100"><div class="card-body">
+      <div class="gs-num">{{ total_clientes }}</div>
+      <div class="text-muted">clientes na Árvore B</div>
+    </div></div>
+  </div>
+  <div class="col-md-4">
+    <div class="card gs-card h-100"><div class="card-body">
+      <div class="gs-num">{{ arvore.altura }}</div>
+      <div class="text-muted">níveis (grau mínimo t = {{ arvore.grau_minimo }})</div>
+    </div></div>
+  </div>
+  <div class="col-md-4">
+    <a class="card gs-card h-100 text-decoration-none" href="{{ url_for('arvore') }}"><div class="card-body">
+      <h5 class="card-title">Instrumentação da Árvore B</h5>
+      <p class="card-text text-muted mb-0">Altura, nós, divisões e nós visitados na busca.</p>
+    </div></a>
   </div>
 </div>
 
