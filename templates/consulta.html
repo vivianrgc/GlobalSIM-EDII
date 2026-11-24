@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block titulo %}Consulta integrada{% endblock %}
+{% block conteudo %}
+<div class="row justify-content-center">
+  <div class="col-lg-9">
+    <h2 class="mb-1">Consulta integrada</h2>
+    <p class="text-muted">Cliente (Árvore B) + destino (Tabela Hash) + pacote contratado: as duas buscas acontecem em estruturas diferentes e o resultado é cruzado no final.</p>
+
+    <div class="card gs-card mb-4"><div class="card-body">
+      <form method="get" action="{{ url_for('consulta') }}" class="row g-2 align-items-end">
+        <div class="col-md-4">
+          <label class="form-label" for="cliente">ID do cliente</label>
+          <input class="form-control" id="cliente" name="cliente" inputmode="numeric" placeholder="2951" value="{{ cliente_id }}" required autofocus>
+        </div>
+        <div class="col-md-5">
+          <label class="form-label" for="destino">País de destino</label>
+          <select class="form-select" id="destino" name="destino">
+            <option value="">Usar o destino do cliente</option>
+            {% for p in paises %}<option value="{{ p.codigo }}" {{ 'selected' if destino|upper == p.codigo }}>{{ p.codigo }} — {{ p.pais }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="col-md-3 d-grid">
+          <button class="btn btn-primary" type="submit">Consultar</button>
+        </div>
+      </form>
+    </div></div>
+
+    {% if resultado %}
+    <div class="row g-3 mb-3">
+      <div class="col-md-6">
+        <div class="card gs-card h-100">
+          <div class="card-header fw-bold">Etapa 1 · Árvore B (cliente)</div>
+          <div class="card-body">
+            {% if resultado.cliente %}
+              <p class="mb-1"><strong>{{ resultado.cliente.nome }}</strong> <span class="badge text-bg-dark">{{ resultado.cliente.id }}</span></p>
+              <p class="small text-muted mb-2">{{ resultado.cliente.email }} · origem {{ resultado.cliente.pais_origem }}
+                · eSIM: {{ 'sim' if resultado.cliente.esim else 'não' }}
+                · pacote: {{ resultado.pacote.nome if resultado.pacote else 'nenhum' }}</p>
+            {% elif resultado.busca_cliente %}
+              <p class="text-danger mb-2">Cliente <strong>{{ resultado.cliente_id }}</strong> não encontrado.</p>
+            {% else %}
+              <p class="text-muted mb-0">Nenhuma busca feita.</p>
+            {% endif %}
+            {% if resultado.busca_cliente %}
+            <p class="small text-muted mb-0"><strong>{{ resultado.busca_cliente.nos_visitados }}</strong> nó{{ '' if resultado.busca_cliente.nos_visitados == 1 else 's' }} visitado{{ '' if resultado.busca_cliente.nos_visitados == 1 else 's' }}
+              (altura {{ resultado.busca_cliente.altura }}) · {{ resultado.busca_cliente.comparacoes }} comparações<br>
+              caminho: {% for nos in resultado.busca_cliente.caminho %}[{{ nos|join(' ') }}]{{ ' → ' if not loop.last }}{% endfor %}</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card gs-card h-100">
+          <div class="card-header fw-bold">Etapa 2 · Tabela Hash (país)</div>
+          <div class="card-body">
+            {% if resultado.pais %}
+              <p class="mb-1"><strong>{{ resultado.pais.pais }}</strong> <span class="badge text-bg-dark">{{ resultado.pais.codigo }}</span>
+                {% if resultado.pais.estado == 'falha' %}<span class="badge text-bg-danger">em falha</span>{% else %}<span class="badge text-bg-success">ativo</span>{% endif %}</p>
+              <p class="small text-muted mb-2">{{ resultado.pais.regiao }} · {{ resultado.pais.operadora }} · {{ resultado.pais.tecnologia }}</p>
+            {% elif resultado.busca_pais %}
+              <p class="text-danger mb-2">País <strong>{{ resultado.codigo }}</strong> não encontrado.</p>
+            {% else %}
+              <p class="text-muted mb-0">Esta etapa só acontece depois que o cliente é encontrado.</p>
+            {% endif %}
+            {% if resultado.busca_pais %}
+            <p class="small text-muted mb-0">hash("{{ resultado.busca_pais.chave }}") = {{ resultado.busca_pais.hash }} →
+              índice {{ resultado.busca_pais.indice }} (mod {{ resultado.busca_pais.capacidade }}) ·
+              {{ resultado.busca_pais.comparacoes }} comparaç{{ 'ão' if resultado.busca_pais.comparacoes == 1 else 'ões' }}</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-{{ resultado.nivel }} mb-3" role="alert">
+      <strong>Resultado:</strong> {{ resultado.mensagem }}
+      {% if resultado.sugestoes %}
+      <div class="mt-2 small">Pacotes que cobrem {{ resultado.pais.regiao }}:
+        {% for p in resultado.sugestoes %}<span class="badge text-bg-light border">{{ p.nome }} · {{ p.dados_gb }} GB</span> {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+    {% if resultado.cliente %}<a href="{{ url_for('detalhe_cliente', cliente_id=resultado.cliente.id) }}">Abrir o cadastro do cliente</a>{% endif %}
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
