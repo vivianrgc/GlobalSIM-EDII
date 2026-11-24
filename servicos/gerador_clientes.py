@@ -27,7 +27,7 @@ _SEM_ACENTO = str.maketrans("áàâãéêíóôõúçÁÀÂÃÉÊÍÓÔÕÚÇ", 
 
 def gerar_clientes(caminho_saida: str, caminho_paises: str, caminho_pacotes: str,
                    quantidade: int = 1000, semente: int = 2026) -> int:
-    """Grava ${quantidade} clientes em caminho_saida; devolve quantos gravou."""
+    """Grava a quantidade pedida de clientes em caminho_saida; devolve quantos gravou."""
     rnd = random.Random(semente)
     with open(caminho_paises, encoding="utf-8") as f:
         codigos = [p["codigo"] for p in json.load(f)]
