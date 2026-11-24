@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block titulo %}Cliente {{ cliente.id }}{% endblock %}
+{% block conteudo %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="mb-0">Cliente <span class="badge text-bg-dark">{{ cliente.id }}</span> {{ cliente.nome }}</h2>
+  <div>
+    <a class="btn btn-outline-primary" href="{{ url_for('editar_cliente', cliente_id=cliente.id) }}">Editar</a>
+    <a class="btn btn-primary" href="{{ url_for('consulta', cliente=cliente.id, destino=cliente.destino) }}">Consulta integrada</a>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="card gs-card mb-3"><div class="card-body">
+      <dl class="row mb-0">
+        <dt class="col-sm-4">E-mail</dt><dd class="col-sm-8">{{ cliente.email }}</dd>
+        <dt class="col-sm-4">País de origem</dt><dd class="col-sm-8"><span class="badge text-bg-dark">{{ cliente.pais_origem }}</span></dd>
+        <dt class="col-sm-4">Destino</dt><dd class="col-sm-8">{% if cliente.destino %}<span class="badge text-bg-dark">{{ cliente.destino }}</span>{% else %}<span class="text-muted">não informado</span>{% endif %}</dd>
+        <dt class="col-sm-4">eSIM</dt><dd class="col-sm-8">{% if cliente.esim %}<code>{{ cliente.esim }}</code>{% else %}<span class="text-muted">sem eSIM</span>{% endif %}</dd>
+        <dt class="col-sm-4">Pacote</dt>
+        <dd class="col-sm-8">{% if pacote %}{{ pacote.nome }} <span class="text-muted small">({{ pacote.dados_gb }} GB · {{ pacote.validade_dias }} dias · {{ pacote.regioes|join(', ') }})</span>{% else %}<span class="text-muted">sem pacote</span>{% endif %}</dd>
+      </dl>
+    </div></div>
+
+    <div class="card gs-card"><div class="card-body">
+      <h5 class="card-title">Associar eSIM e pacote</h5>
+      <div class="d-flex flex-wrap gap-3 align-items-end">
+        <form method="post" action="{{ url_for('associar_esim', cliente_id=cliente.id) }}">
+          <button class="btn btn-outline-success" type="submit" {{ 'disabled' if cliente.esim }}>{{ 'eSIM já associado' if cliente.esim else 'Gerar e associar eSIM' }}</button>
+        </form>
+        <form class="d-flex gap-2" method="post" action="{{ url_for('associar_pacote', cliente_id=cliente.id) }}">
+          <select class="form-select" name="pacote" aria-label="Pacote">
+            <option value="">Sem pacote</option>
+            {% for p in pacotes %}<option value="{{ p.id }}" {{ 'selected' if cliente.pacote == p.id }}>{{ p.nome }} · {{ p.dados_gb }} GB</option>{% endfor %}
+          </select>
+          <button class="btn btn-primary" type="submit">Salvar pacote</button>
+        </form>
+      </div>
+    </div></div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card gs-card border-info"><div class="card-body">
+      <h5 class="card-title">Como a Árvore B respondeu</h5>
+      <p class="mb-1"><strong>{{ busca.nos_visitados }}</strong> nó{{ '' if busca.nos_visitados == 1 else 's' }} visitado{{ '' if busca.nos_visitados == 1 else 's' }}
+        (altura {{ busca.altura }}) · {{ busca.comparacoes }} comparações</p>
+      <ol class="small mb-2">
+        {% for nos in busca.caminho %}<li>nó com {{ nos|length }} chave{{ '' if nos|length == 1 else 's' }}: <span class="text-muted">{{ nos|join(' · ') }}</span></li>{% endfor %}
+      </ol>
+      <a href="{{ url_for('arvore') }}" class="small">ver instrumentação da árvore</a>
+    </div></div>
+  </div>
+</div>
+{% endblock %}
