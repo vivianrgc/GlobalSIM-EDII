@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block titulo %}Árvore B{% endblock %}
+{% block conteudo %}
+{% set e = dados.estatisticas %}{% set m = dados.metricas %}{% set u = dados.ultima_busca %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <h2 class="mb-0">Instrumentação · Árvore B</h2>
+  <div class="d-flex gap-2">
+    <form class="d-flex gap-2" method="post" action="{{ url_for('reconstruir_arvore') }}">
+      <input class="form-control" type="number" name="grau" min="2" max="50" value="{{ e.grau_minimo }}" aria-label="Grau mínimo" style="width: 6rem">
+      <button class="btn btn-outline-primary" type="submit">Reconstruir com t</button>
+    </form>
+    <form method="post" action="{{ url_for('zerar_arvore') }}">
+      <button class="btn btn-outline-secondary" type="submit">Zerar contadores</button>
+    </form>
+  </div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-6 col-md-3"><div class="card gs-card h-100"><div class="card-body"><div class="gs-num">{{ e.altura }}</div><div class="text-muted">altura (níveis)</div></div></div></div>
+  <div class="col-6 col-md-3"><div class="card gs-card h-100"><div class="card-body"><div class="gs-num">{{ e.total_nos }}</div><div class="text-muted">nós</div></div></div></div>
+  <div class="col-6 col-md-3"><div class="card gs-card h-100"><div class="card-body"><div class="gs-num">{{ e.total_divisoes }}</div><div class="text-muted">divisões de nó (splits)</div></div></div></div>
+  <div class="col-6 col-md-3"><div class="card gs-card h-100"><div class="card-body"><div class="gs-num">{{ u.nos_visitados if u else '—' }}</div><div class="text-muted">nós visitados na última busca</div></div></div></div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-lg-6">
+    <div class="card gs-card h-100"><div class="card-body">
+      <h5 class="card-title">Parâmetros e retrato</h5>
+      <table class="table table-sm mb-0">
+        <tr><th>Grau mínimo t</th><td>{{ e.grau_minimo }}</td></tr>
+        <tr><th>Chaves por nó</th><td>{{ e.min_chaves_no }} a {{ e.max_chaves_no }} (raiz: 1 a {{ e.max_chaves_no }})</td></tr>
+        <tr><th>Filhos por nó interno</th><td>até {{ e.max_filhos_no }}</td></tr>
+        <tr><th>Total de chaves (clientes)</th><td>{{ e.total_chaves }}</td></tr>
+        <tr><th>Ocupação média dos nós</th><td>{{ '%.0f'|format(e.ocupacao * 100) }}%</td></tr>
+        <tr><th>Nós por nível</th><td>{{ e.nos_por_nivel|join(' · ') }}</td></tr>
+      </table>
+    </div></div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card gs-card h-100"><div class="card-body">
+      <h5 class="card-title">Contadores acumulados</h5>
+      <table class="table table-sm mb-0">
+        <tr><th>Inserções</th><td>{{ m.insercoes }}</td></tr>
+        <tr><th>Buscas (com sucesso)</th><td>{{ m.buscas }} ({{ m.buscas_com_sucesso }})</td></tr>
+        <tr><th>Atualizações</th><td>{{ m.atualizacoes }}</td></tr>
+        <tr><th>Nós visitados (total)</th><td>{{ m.nos_visitados_total }}</td></tr>
+        <tr><th>Comparações de chave</th><td>{{ m.comparacoes }}</td></tr>
+        <tr><th>Divisões de nó</th><td>{{ m.divisoes }}</td></tr>
+      </table>
+      <p class="small text-muted mt-2 mb-0">As divisões incluem as da carga inicial do JSON. Ao "Reconstruir", os contadores recomeçam.</p>
+    </div></div>
+  </div>
+</div>
+
+<div class="card gs-card mb-3"><div class="card-body">
+  <h5 class="card-title">Última busca</h5>
+  {% if u %}
+  <p class="mb-1">{{ u.operacao }} do ID <strong>{{ u.chave }}</strong>:
+    {% if u.encontrado %}<span class="badge text-bg-success">encontrado</span>{% else %}<span class="badge text-bg-danger">não encontrado</span>{% endif %}
+    · {{ u.nos_visitados }} nós visitados · {{ u.comparacoes }} comparações</p>
+  <p class="small text-muted mb-0">Caminho: {% for nos in u.caminho %}<code>[{{ nos|join(' ') }}]</code>{{ ' → ' if not loop.last }}{% endfor %}</p>
+  {% else %}
+  <p class="text-muted mb-0">Ainda não houve busca. Consulte um cliente em <a href="{{ url_for('listar_clientes') }}">Clientes</a>.</p>
+  {% endif %}
+</div></div>
+
+<div class="card gs-card"><div class="card-body">
+  <h5 class="card-title">Estrutura por nível</h5>
+  {% for nivel in dados.niveis %}
+  <div class="mb-3">
+    <div class="small fw-bold mb-1">Nível {{ nivel.nivel }}{{ ' (raiz)' if nivel.nivel == 0 }} · {{ nivel.total_nos }} nó{{ '' if nivel.total_nos == 1 else 's' }}
+      {% if nivel.truncado %}<span class="text-muted fw-normal">(mostrando os {{ nivel.nos|length }} primeiros)</span>{% endif %}</div>
+    <div class="d-flex flex-wrap gap-1">
+      {% for chaves in nivel.nos %}<span class="badge text-bg-light border text-wrap">{{ chaves|join(' | ') }}</span>{% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+</div></div>
+{% endblock %}
