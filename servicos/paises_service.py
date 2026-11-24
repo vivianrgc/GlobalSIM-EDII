@@ -17,6 +17,9 @@ from estruturas import TabelaHash, explicar_hash
 
 TECNOLOGIAS = ["3G", "4G", "5G"]
 CAMPOS = ("codigo", "pais", "regiao", "operadora", "tecnologia")
+# Diferencial (Etapa 2): estado operacional do país. Não vem do formulário de
+# cadastro/edição; é alterado só por definir_estado().
+ESTADOS = ("ativo", "falha")
 _REGEX_CODIGO = re.compile(r"^[A-Z]{2}$")
 
 
@@ -37,9 +40,11 @@ class PaisesService:
             return 0
         with open(self.caminho_json, encoding="utf-8") as arquivo:
             registros = json.load(arquivo)
-        for registro in registros:
-            registro = {campo: str(registro.get(campo, "")).strip() for campo in CAMPOS}
+        for bruto in registros:
+            registro = {campo: str(bruto.get(campo, "")).strip() for campo in CAMPOS}
             registro["codigo"] = normalizar_codigo(registro["codigo"])
+            estado = str(bruto.get("estado", "")).strip()
+            registro["estado"] = estado if estado in ESTADOS else "ativo"
             self.tabela.inserir(registro["codigo"], registro)
         return len(self.tabela)
 
@@ -97,6 +102,7 @@ class PaisesService:
         erros = self.validar(dados, novo=True)
         if erros:
             return None, erros, dados
+        dados["estado"] = "ativo"
         self.tabela.inserir(dados["codigo"], dados)
         self.salvar()
         return dados, {}, dados
@@ -110,9 +116,26 @@ class PaisesService:
         erros = self.validar(dados, novo=False)
         if erros:
             return None, erros, dados
+        dados["estado"] = self.tabela.buscar(codigo).get("estado", "ativo")  # preserva
         self.tabela.atualizar(codigo, dados)
         self.salvar()
         return dados, {}, dados
+
+    def definir_estado(self, codigo: str, estado: str) -> bool:
+        """Marca o país como "ativo" ou "falha" (diferencial da equipe)."""
+        codigo = normalizar_codigo(codigo)
+        atual = self.tabela.buscar(codigo)
+        if atual is None or estado not in ESTADOS:
+            return False
+        atual = dict(atual)
+        atual["estado"] = estado
+        self.tabela.atualizar(codigo, atual)
+        self.salvar()
+        return True
+
+    def contem(self, codigo: str) -> bool:
+        """Existe o país? (não altera as métricas da Tabela Hash)."""
+        return self.tabela.contem(normalizar_codigo(codigo))
 
     def remover(self, codigo: str) -> bool:
         removido = self.tabela.remover(normalizar_codigo(codigo))
